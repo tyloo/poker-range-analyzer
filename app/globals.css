@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Card suit colors */
+.suit-hearts, .suit-diamonds {
+  color: #ef4444;
+}
+
+.suit-clubs, .suit-spades {
+  color: #1f2937;
+}
+
+/* Matrix cell - compact */
+.matrix-cell {
+  @apply w-7 h-7 text-[11px] font-semibold flex items-center justify-center rounded cursor-pointer transition-all border-2 border-gray-700 sm:w-6 sm:h-6 sm:text-[10px] lg:w-7 lg:h-7 lg:text-[11px] xl:w-8 xl:h-8 xl:text-[12px];
+}
+
+.matrix-cell:hover {
+  @apply border-white;
+}
+
+/* Card picker cell - compact */
+.card-cell {
+  @apply rounded text-[10px] font-bold flex flex-col items-center justify-center transition-all duration-100 border-2 border-transparent sm:text-[11px] lg:text-[13px] xl:text-[14px];
+}
+
+.card-cell-compact {
+  @apply lg:text-[12px] xl:text-[13px];
+}
+
+.card-cell-tight {
+  @apply lg:text-[11px] xl:text-[12px];
+}
+
+/* Mobile card grid - auto sizing */
+@media (max-width: 639px) {
+  .card-grid {
+    height: auto;
+  }
+  .card-grid .card-cell {
+    aspect-ratio: 1 / 1.3;
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Desktop card grid - constrained height */
+@media (min-width: 640px) {
+  .card-grid {
+    height: clamp(240px, 38vh, 460px);
+  }
+}
+
+/* Bottom sheet animation */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
