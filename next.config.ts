@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Optimize barrel file imports for faster builds and smaller bundles (rule 2.1)
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@base-ui/react'],
+  },
 };
 
 export default nextConfig;

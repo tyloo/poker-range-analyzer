@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useState, useMemo } from 'react';
+import { memo, useEffect, useState, useMemo, useTransition, useRef } from 'react';
 import { Card as CardType, HoleCards, Position, EquityResult, ActionRecommendation } from '@/lib/types';
 import { classifyHoleCards } from '@/lib/cards';
 import { analyzeBoardTexture, evaluateHand, getHandRankValue } from '@/lib/handStrength';
@@ -89,28 +89,41 @@ function AnalysisSummary({
   heroPosition,
   villainPosition,
 }: AnalysisSummaryProps) {
+  const [isPending, startTransition] = useTransition();
   const [equity, setEquity] = useState<EquityResult | null>(null);
-  const [isCalculating, setIsCalculating] = useState(false);
   const [recommendation, setRecommendation] = useState<ActionRecommendation | null>(null);
+  const prevInputsRef = useRef<string>('');
 
+  // Compute a stable key for the current inputs
+  const inputsKey = useMemo(() => {
+    if (!holeCards) return '';
+    return `${holeCards[0].rank}${holeCards[0].suit}-${holeCards[1].rank}${holeCards[1].suit}-${board.map(c => `${c.rank}${c.suit}`).join('-')}-${heroPosition}-${villainPosition}`;
+  }, [holeCards, board, heroPosition, villainPosition]);
+
+  // Update equity when inputs change, using transition for non-blocking updates
   useEffect(() => {
+    // Early return if no hole cards - values will be stale but EmptyState renders
     if (!holeCards) {
-      setEquity(null);
-      setRecommendation(null);
-      setIsCalculating(false);
+      prevInputsRef.current = '';
       return;
     }
 
-    setIsCalculating(true);
-    const timer = setTimeout(() => {
+    // Only recalculate if inputs actually changed
+    if (inputsKey === prevInputsRef.current) {
+      return;
+    }
+    prevInputsRef.current = inputsKey;
+
+    // Use transition so the UI remains responsive during heavy calculation
+    startTransition(() => {
       const result = calculateEquityVsRange(holeCards, board, villainPosition, 1000);
       setEquity(result);
       setRecommendation(getActionRecommendation(holeCards, board, heroPosition, result.equity));
-      setIsCalculating(false);
-    }, 10);
+    });
+  }, [holeCards, board, heroPosition, villainPosition, inputsKey]);
 
-    return () => clearTimeout(timer);
-  }, [holeCards, board, heroPosition, villainPosition]);
+  // Derived loading state from transition
+  const isCalculating = isPending;
 
   // Memoize derived values that don't depend on async state
   const classification = useMemo(

@@ -31,14 +31,12 @@ export function isHandInRange(position: Position, hand: string): boolean {
 
 export function getRangePercentage(position: Position): number {
   const range = ranges[position];
-  let totalCombos = 0;
   let inRangeCombos = 0;
 
   for (const hand of Object.keys(range)) {
     const action = range[hand];
     const combos = getHandCombos(hand);
     const freq = (action.raise + action.call) / 100;
-    totalCombos += combos;
     inRangeCombos += combos * freq;
   }
 

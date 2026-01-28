@@ -2,10 +2,10 @@
 
 import { Card, HoleCards, Position, ActionRecommendation } from '@/lib/types';
 import { classifyHoleCards } from '@/lib/cards';
-import { evaluateHand, analyzeBoardTexture, getHandRankValue } from '@/lib/handStrength';
+import { evaluateHand, getHandRankValue } from '@/lib/handStrength';
 import { calculateEquityVsRange } from '@/lib/equity';
 import { getHandAction } from '@/lib/ranges';
-import { useEffect, useState } from 'react';
+import { useMemo, useTransition, useEffect, useState, useRef } from 'react';
 
 interface ActionAdviceProps {
   holeCards: HoleCards;
@@ -71,23 +71,39 @@ const ACTION_COLORS = {
 };
 
 export default function ActionAdvice({ holeCards, board, heroPosition, villainPosition }: ActionAdviceProps) {
+  const [, startTransition] = useTransition();
   const [recommendation, setRecommendation] = useState<ActionRecommendation | null>(null);
+  const prevInputsRef = useRef<string>('');
 
+  // Compute a stable key for the current inputs
+  const inputsKey = useMemo(() => {
+    if (!holeCards) return '';
+    return `${holeCards[0].rank}${holeCards[0].suit}-${holeCards[1].rank}${holeCards[1].suit}-${board.map(c => `${c.rank}${c.suit}`).join('-')}-${heroPosition}-${villainPosition}`;
+  }, [holeCards, board, heroPosition, villainPosition]);
+
+  // Update recommendation when inputs change, using transition for non-blocking updates
   useEffect(() => {
+    // Early return if no hole cards - recommendation will be stale but component won't render
     if (!holeCards) {
-      setRecommendation(null);
+      prevInputsRef.current = '';
       return;
     }
 
-    const timer = setTimeout(() => {
+    // Only recalculate if inputs actually changed
+    if (inputsKey === prevInputsRef.current) {
+      return;
+    }
+    prevInputsRef.current = inputsKey;
+
+    // Use transition so the UI remains responsive during calculation
+    startTransition(() => {
       const equity = calculateEquityVsRange(holeCards, board, villainPosition, 500);
       const rec = getActionRecommendation(holeCards, board, heroPosition, equity.equity);
       setRecommendation(rec);
-    }, 10);
+    });
+  }, [holeCards, board, heroPosition, villainPosition, inputsKey]);
 
-    return () => clearTimeout(timer);
-  }, [holeCards, board, heroPosition, villainPosition]);
-
+  // Don't render if no cards - no need to setState to null
   if (!holeCards || !recommendation) {
     return null;
   }
