@@ -1,5 +1,11 @@
 # Poker Range Analyzer
 
+[![CI](https://github.com/Tyloo/poker-range-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/Tyloo/poker-range-analyzer/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8)](https://tailwindcss.com/)
+
 A modern, interactive poker range analyzer for 6-max No-Limit Hold'em. Visualize GTO preflop ranges, calculate equity, and get action recommendations.
 
 ## Features
