@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "A modern poker range analyzer for 6-max No-Limit Hold'em with GTO preflop ranges and equity calculation",
   "license": "MIT",
-  "author": "",
+  "author": "Tyloo <jbonva@gmail.com>",
   "keywords": [
     "poker",
     "range",
@@ -18,7 +18,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
